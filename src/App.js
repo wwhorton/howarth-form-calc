@@ -4,19 +4,50 @@ import { Button, Container, Form, Stack } from "react-bootstrap";
 import { useState } from "react";
 
 function App() {
-  const [result, setResult] = useState(0);
+  const [FEI, setFEI] = useState(0);
+  const [FEILabel, setFEILabel] = useState("");
   const [pressureBasis, setPressureBasis] = useState("total");
   const [cfm, setCfm] = useState(0);
   const [pressure, setPressure] = useState(0);
   const [power, setPower] = useState(0);
   const [gasDensity, setGasDensity] = useState(0);
 
-  function calculate() {
+  function calculateFEI() {
+    const FEPact = calculateFEPact(power);
+    const FEPref = calculateFEPref();
     return 0;
   }
 
+  function calculateFEPref() {
+    return 0;
+  }
+
+  function calculateFEPact(hiAct) {
+    const actualTransmissionLoss = 0.96 * Math.pow(hiAct / (hiAct + 2.2), 0.05);
+    const actualMotorEfficiency = 0;
+
+    return (
+      hiAct *
+      (1 / actualTransmissionLoss) *
+      (1 / actualMotorEfficiency) *
+      0.7457
+    );
+  }
+
+  function generateLabel() {
+    switch (pressureBasis) {
+      case "total":
+        return "FEIt.i";
+      case "static":
+        return "FEIs.i";
+      default:
+        return "FEI.Error";
+    }
+  }
+
   function handleSubmit() {
-    setResult(calculate());
+    setFEI(calculateFEI());
+    setFEILabel(generateLabel());
   }
 
   function handleSelect(e) {
@@ -119,15 +150,18 @@ function App() {
         </Form>
         <Button
           type={"submit"}
-          onSubmit={handleSubmit}
+          onClick={handleSubmit}
           name={"submit"}
           id={"submitButton"}
         >
           Submit
         </Button>
 
-        <h3>Result:</h3>
-        <p>{result}</p>
+        <h3>Results:</h3>
+        <h4>FEI:</h4>
+        <p>{FEI}</p>
+        <h4>FEI Label:</h4>
+        <p>{FEILabel}</p>
       </Container>
     </div>
   );
