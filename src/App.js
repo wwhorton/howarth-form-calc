@@ -4,50 +4,82 @@ import { Button, Container, Form, Stack } from "react-bootstrap";
 import { useState } from "react";
 
 function App() {
-  const [FEI, setFEI] = useState(0);
+  const [FEI, setFEI] = useState(0.0);
   const [FEILabel, setFEILabel] = useState("");
-  const [pressureBasis, setPressureBasis] = useState("total");
-  const [cfm, setCfm] = useState(0);
-  const [pressure, setPressure] = useState(0);
-  const [power, setPower] = useState(0);
-  const [gasDensity, setGasDensity] = useState(0);
+  const [pressureBasis, setPressureBasis] = useState("Total");
+  const [cfm, setCfm] = useState(0.0);
+  const [pressure, setPressure] = useState(0.0);
+  const [power, setPower] = useState(0.0);
+  const [gasDensity, setGasDensity] = useState(0.0);
 
   function calculateFEI() {
-    const FEPact = calculateFEPact(power);
-    const FEPref = calculateFEPref();
-    return 0;
-  }
-
-  function calculateFEPref() {
-    return 0;
-  }
-
-  function calculateFEPact(hiAct) {
-    const actualTransmissionLoss = 0.96 * Math.pow(hiAct / (hiAct + 2.2), 0.05);
-    const actualMotorEfficiency = 0;
-
-    return (
-      hiAct *
-      (1 / actualTransmissionLoss) *
-      (1 / actualMotorEfficiency) *
-      0.7457
-    );
-  }
-
-  function generateLabel() {
-    switch (pressureBasis) {
-      case "total":
-        return "FEIt.i";
-      case "static":
-        return "FEIs.i";
-      default:
-        return "FEI.Error";
+    // Get user input values
+    const Qi = parseFloat(cfm);
+    const pBasis = pressureBasis;
+    const Pi = parseFloat(pressure);
+    const HiAct = parseFloat(power);
+    const rho = parseFloat(gasDensity);
+    // Calculate actual transmission loss
+    const etaTransAct = 0.96 * Math.pow(HiAct / (HiAct + 2.2), 0.05);
+    // Calculate actual motor efficiency
+    let etaMtrAct;
+    if (HiAct >= 250) {
+      etaMtrAct = 0.962;
+    } else {
+      etaMtrAct =
+        -0.003812 * Math.pow(Math.log(HiAct / (etaTransAct * 0.7457)), 4) +
+        0.025834 * Math.pow(Math.log(HiAct / (etaTransAct * 0.7457)), 3) -
+        0.072577 * Math.pow(Math.log(HiAct / (etaTransAct * 0.7457)), 2) +
+        0.125559 * Math.log(HiAct / (etaTransAct * 0.7457)) +
+        0.850274;
     }
+
+    // Calculate actual Fan Electrical Power
+    const FEPAct = HiAct * (1 / etaTransAct) * (1 / etaMtrAct) * 0.7457;
+
+    // Determine constants to use based on pressure basis
+    let Q0, P0, eta0;
+    if (pBasis === "Total") {
+      Q0 = 250;
+      P0 = 0.4;
+      eta0 = 0.66;
+      setFEILabel("FEIt.i");
+    } else if (pBasis === "Static") {
+      Q0 = 250;
+      P0 = 0.4;
+      eta0 = 0.6;
+      setFEILabel("FEIs.i");
+    } else {
+      setFEILabel("FEI.Error");
+    }
+
+    // Calculate reference fan shaft power
+    const HiRef = ((Qi + Q0) * (Pi + (P0 * rho) / 0.075)) / (6343 * eta0);
+
+    // Calculate reference fan transmission efficiency
+    const etaTransRef = 0.96 * Math.pow(HiRef / (HiRef + 2.2), 0.05);
+
+    // Calculate reference motor efficiency
+    let etaMtrRef;
+    if (HiRef >= 250) {
+      etaMtrRef = 0.962;
+    } else {
+      etaMtrRef =
+        -0.003812 * Math.pow(Math.log(HiRef / (etaTransRef * 0.7457)), 4) +
+        0.025834 * Math.pow(Math.log(HiRef / (etaTransRef * 0.7457)), 3) -
+        0.072577 * Math.pow(Math.log(HiRef / (etaTransRef * 0.7457)), 2) +
+        0.125559 * Math.log(HiRef / (etaTransRef * 0.7457)) +
+        0.850274;
+    }
+
+    // Calculate Refual Fan Electrical Power
+    const FEPRef = HiRef * (1 / etaTransRef) * (1 / etaMtrRef) * 0.7457;
+    const FEI = FEPRef / FEPAct;
+    return Math.round((FEI + Number.EPSILON) * 100) / 100;
   }
 
   function handleSubmit() {
     setFEI(calculateFEI());
-    setFEILabel(generateLabel());
   }
 
   function handleSelect(e) {
@@ -94,19 +126,19 @@ function App() {
                 type={"radio"}
                 id={"pbTotalRadio"}
                 label={"Total"}
-                value={"total"}
+                value={"Total"}
                 name={"pressureBasis"}
                 onChange={handleSelect}
-                checked={pressureBasis === "total"}
+                checked={pressureBasis === "Total"}
               />
               <Form.Check
                 type={"radio"}
                 id={"pbStaticRadio"}
                 label={"Static"}
-                value={"static"}
+                value={"Static"}
                 name={"pressureBasis"}
                 onChange={handleSelect}
-                checked={pressureBasis === "static"}
+                checked={pressureBasis === "Static"}
               />
             </Stack>
           </Form.Group>
