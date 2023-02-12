@@ -1,6 +1,6 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.scss";
-import { Button, Container, Form, Stack } from "react-bootstrap";
+import { Button, Col, Container, Form, Row, Stack } from "react-bootstrap";
 import { useState } from "react";
 
 function App() {
@@ -44,13 +44,11 @@ function App() {
       P0 = 0.4;
       eta0 = 0.66;
       setFEILabel("FEIt.i");
-    } else if (pBasis === "Static") {
+    } else {
       Q0 = 250;
       P0 = 0.4;
       eta0 = 0.6;
       setFEILabel("FEIs.i");
-    } else {
-      setFEILabel("FEI.Error");
     }
 
     // Calculate reference fan shaft power
@@ -87,6 +85,7 @@ function App() {
   }
 
   function handleInput(e) {
+    // eslint-disable-next-line default-case
     switch (e.target.name) {
       case "cfm":
         setCfm(e.target.value);
@@ -99,101 +98,118 @@ function App() {
         break;
       case "gasDensity":
         setGasDensity(e.target.value);
-        break;
-      default:
-        break;
     }
   }
 
   return (
     <div className="App">
       <Container>
-        <Form>
-          <Form.Group>
-            <Form.Label htmlFor={"cfmInput"}>Actual Fan Flow (CFM):</Form.Label>
-            <Form.Control
-              type={"text"}
-              name={"cfm"}
-              value={cfm}
-              id={"cfmInput"}
-              onChange={handleInput}
-            />
-          </Form.Group>
-          <Form.Group>
-            <Form.Label>Pressure Basis</Form.Label>
-            <Stack direction={"horizontal"}>
-              <Form.Check
-                type={"radio"}
-                id={"pbTotalRadio"}
-                label={"Total"}
-                value={"Total"}
-                name={"pressureBasis"}
-                onChange={handleSelect}
-                checked={pressureBasis === "Total"}
-              />
-              <Form.Check
-                type={"radio"}
-                id={"pbStaticRadio"}
-                label={"Static"}
-                value={"Static"}
-                name={"pressureBasis"}
-                onChange={handleSelect}
-                checked={pressureBasis === "Static"}
-              />
+        <Row className="justify-content-md-center">
+          <Col md={2}>
+            <Stack>
+              <Form>
+                <Form.Group>
+                  <Form.Label htmlFor={"cfmInput"}>
+                    Actual Fan Flow (CFM):
+                    <Form.Control
+                      type={"text"}
+                      name={"cfm"}
+                      value={cfm}
+                      id={"cfmInput"}
+                      onChange={handleInput}
+                    />
+                  </Form.Label>
+                </Form.Group>
+                <Form.Group>
+                  <Form.Label>
+                    Pressure Basis
+                    <Stack direction={"horizontal"} gap={5}>
+                      <Form.Check
+                        type={"radio"}
+                        id={"pbTotalRadio"}
+                        label={"Total"}
+                        value={"Total"}
+                        name={"pressureBasis"}
+                        onChange={handleSelect}
+                        checked={pressureBasis === "Total"}
+                      />
+                      <Form.Check
+                        type={"radio"}
+                        id={"pbStaticRadio"}
+                        label={"Static"}
+                        value={"Static"}
+                        name={"pressureBasis"}
+                        onChange={handleSelect}
+                        checked={pressureBasis === "Static"}
+                      />
+                    </Stack>
+                  </Form.Label>
+                </Form.Group>
+
+                <Stack>
+                  <Form.Group>
+                    <Form.Label htmlFor={"pressureInput"}>
+                      Actual Pressure (in. wg):
+                      <Form.Control
+                        type={"text"}
+                        name={"pressure"}
+                        id={"pressureInput"}
+                        value={pressure}
+                        onChange={handleInput}
+                      />
+                    </Form.Label>
+                  </Form.Group>
+                  <Form.Group>
+                    <Form.Label htmlFor={"powerInput"}>
+                      Actual Power:
+                      <Form.Control
+                        type={"text"}
+                        name={"power"}
+                        id={"powerInput"}
+                        value={power}
+                        onChange={handleInput}
+                      />
+                    </Form.Label>
+                  </Form.Group>
+                  <Form.Group>
+                    <Form.Label htmlFor={"gasDensityInput"}>
+                      Gas Density (lb/ft^3):
+                      <Form.Control
+                        type={"text"}
+                        name={"gasDensity"}
+                        id={"gasDensityInput"}
+                        value={gasDensity}
+                        onChange={handleInput}
+                      />
+                    </Form.Label>
+                  </Form.Group>
+                </Stack>
+
+                <Button
+                  type={"submit"}
+                  onClick={handleSubmit}
+                  name={"submit"}
+                  id={"submitButton"}
+                  variant={"primary"}
+                  size={"lg"}
+                >
+                  Submit
+                </Button>
+              </Form>
             </Stack>
-          </Form.Group>
-
-          <Stack>
-            <Form.Group>
-              <Form.Label htmlFor={"pressureInput"}>
-                Actual Pressure (in. wg):
-              </Form.Label>
-              <Form.Control
-                type={"text"}
-                name={"pressure"}
-                id={"pressureInput"}
-                value={pressure}
-                onChange={handleInput}
-              />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label htmlFor={"powerInput"}>Actual Power:</Form.Label>
-              <Form.Control
-                type={"text"}
-                name={"power"}
-                id={"powerInput"}
-                value={power}
-                onChange={handleInput}
-              />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label htmlFor={"gasDensityInput"}>
-                Gas Density (lb/ft^3):
-              </Form.Label>
-              <Form.Control
-                type={"text"}
-                name={"gasDensity"}
-                id={"gasDensityInput"}
-                value={gasDensity}
-                onChange={handleInput}
-              />
-            </Form.Group>
-          </Stack>
-        </Form>
-        <Button
-          type={"submit"}
-          onClick={handleSubmit}
-          name={"submit"}
-          id={"submitButton"}
-        >
-          Submit
-        </Button>
-
-        <h3>Results:</h3>
-        <h4>FEI:</h4>
-        <p>{FEI}</p>
-        <h4>FEI Label:</h4>
-        <p>{FEILabel}</p>
+          </Col>
+          <Col md={2}>
+            <h3>Results:</h3>
+            <Stack direction={"horizontal"} gap={1}>
+              <h4>FEI:</h4>
+              <p>{FEI}</p>
+            </Stack>
+            <Stack direction={"horizontal"} gap={1}>
+              <h4>FEI Label:</h4>
+              <p>{FEILabel}</p>
+            </Stack>
+          </Col>
+        </Row>
       </Container>
     </div>
   );
