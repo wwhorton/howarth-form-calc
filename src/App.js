@@ -4,13 +4,17 @@ import { Button, Col, Container, Form, Row, Stack } from "react-bootstrap";
 import { useState } from "react";
 
 function App() {
-  const [FEI, setFEI] = useState(0.0);
+  const [FEI, setFEI] = useState("");
   const [FEILabel, setFEILabel] = useState("");
   const [pressureBasis, setPressureBasis] = useState("Total");
-  const [cfm, setCfm] = useState(0.0);
-  const [pressure, setPressure] = useState(0.0);
-  const [power, setPower] = useState(0.0);
-  const [gasDensity, setGasDensity] = useState(0.0);
+  const [cfm, setCfm] = useState("");
+  const [pressure, setPressure] = useState("");
+  const [power, setPower] = useState("");
+  const [gasDensity, setGasDensity] = useState("");
+
+  const invalid = [cfm, pressure, power, gasDensity].some(
+    (el) => el === "" || el === "0"
+  );
 
   function calculateFEI() {
     // Get user input values
@@ -76,7 +80,9 @@ function App() {
     return Math.round((FEI + Number.EPSILON) * 100) / 100;
   }
 
-  function handleSubmit() {
+  function handleSubmit(e) {
+    e.preventDefault();
+    e.stopPropagation();
     setFEI(calculateFEI());
   }
 
@@ -102,17 +108,18 @@ function App() {
   }
 
   return (
-    <div className="App">
-      <Container>
-        <Row className="justify-content-md-center">
-          <Col md={2}>
+    <div>
+      <Container fluid>
+        <Row>
+          <Col xs={"auto"}>
             <Stack>
-              <Form>
-                <Form.Group>
+              <Form onSubmit={handleSubmit} id={"feiForm"}>
+                <Form.Group className={"m-3"}>
                   <Form.Label htmlFor={"cfmInput"}>
                     Actual Fan Flow (CFM):
                     <Form.Control
-                      type={"text"}
+                      required
+                      type={"number"}
                       name={"cfm"}
                       value={cfm}
                       id={"cfmInput"}
@@ -120,7 +127,7 @@ function App() {
                     />
                   </Form.Label>
                 </Form.Group>
-                <Form.Group>
+                <Form.Group className={"m-3"}>
                   <Form.Label>
                     Pressure Basis
                     <Stack direction={"horizontal"} gap={5}>
@@ -147,11 +154,12 @@ function App() {
                 </Form.Group>
 
                 <Stack>
-                  <Form.Group>
+                  <Form.Group className={"m-3"}>
                     <Form.Label htmlFor={"pressureInput"}>
                       Actual Pressure (in. wg):
                       <Form.Control
-                        type={"text"}
+                        required
+                        type={"number"}
                         name={"pressure"}
                         id={"pressureInput"}
                         value={pressure}
@@ -159,11 +167,12 @@ function App() {
                       />
                     </Form.Label>
                   </Form.Group>
-                  <Form.Group>
+                  <Form.Group className={"m-3"}>
                     <Form.Label htmlFor={"powerInput"}>
                       Actual Power:
                       <Form.Control
-                        type={"text"}
+                        required
+                        type={"number"}
                         name={"power"}
                         id={"powerInput"}
                         value={power}
@@ -171,11 +180,12 @@ function App() {
                       />
                     </Form.Label>
                   </Form.Group>
-                  <Form.Group>
+                  <Form.Group className={"m-3"}>
                     <Form.Label htmlFor={"gasDensityInput"}>
                       Gas Density (lb/ft^3):
                       <Form.Control
-                        type={"text"}
+                        required
+                        type={"number"}
                         name={"gasDensity"}
                         id={"gasDensityInput"}
                         value={gasDensity}
@@ -187,27 +197,40 @@ function App() {
 
                 <Button
                   type={"submit"}
-                  onClick={handleSubmit}
                   name={"submit"}
                   id={"submitButton"}
                   variant={"primary"}
                   size={"lg"}
+                  className={"m-3"}
+                  disabled={invalid}
                 >
-                  Submit
+                  Calculate FEI
                 </Button>
               </Form>
             </Stack>
           </Col>
-          <Col md={2}>
-            <h3>Results:</h3>
-            <Stack direction={"horizontal"} gap={1}>
-              <h4>FEI:</h4>
-              <p>{FEI}</p>
-            </Stack>
-            <Stack direction={"horizontal"} gap={1}>
-              <h4>FEI Label:</h4>
-              <p>{FEILabel}</p>
-            </Stack>
+          <Col xs={"auto"}>
+            <Row>
+              <Col className={"mt-3 mb-3"}>
+                <h3 className={"text-left"}>Results:</h3>
+              </Col>
+            </Row>
+            <Row className={"align-items-baseline"}>
+              <Col xs={"auto"} className={"mb-1"}>
+                <h4>FEI:</h4>
+              </Col>
+              <Col xs={"auto"} className={"mb-1"}>
+                <p className={""}>{FEI}</p>
+              </Col>
+            </Row>
+            <Row>
+              <Col xs={"auto"} className={"mb-1"}>
+                <h4>FEI Label:</h4>
+              </Col>
+              <Col xs={"auto"} className={"mb-1"}>
+                <p>{FEILabel}</p>
+              </Col>
+            </Row>
           </Col>
         </Row>
       </Container>

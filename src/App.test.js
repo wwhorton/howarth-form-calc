@@ -16,7 +16,7 @@ describe("Form App", () => {
     await user.type(screen.getByLabelText("Actual Pressure (in. wg):"), "3.0");
     await user.type(screen.getByLabelText("Actual Power:"), "6.48");
     await user.type(screen.getByLabelText("Gas Density (lb/ft^3):"), ".080713");
-    await user.click(screen.getByText("Submit"));
+    await user.click(screen.getByText("Calculate FEI"));
 
     expect(screen.getByText("1.29")).toBeInTheDocument();
     expect(screen.getByText("FEIt.i")).toBeInTheDocument();
@@ -28,7 +28,7 @@ describe("Form App", () => {
     await user.type(screen.getByLabelText("Actual Pressure (in. wg):"), "3.0");
     await user.type(screen.getByLabelText("Actual Power:"), "6.48");
     await user.type(screen.getByLabelText("Gas Density (lb/ft^3):"), ".080713");
-    await user.click(screen.getByText("Submit"));
+    await user.click(screen.getByText("Calculate FEI"));
 
     expect(screen.getByText("1.41")).toBeInTheDocument();
     expect(screen.getByText("FEIs.i")).toBeInTheDocument();
@@ -40,7 +40,7 @@ describe("Form App", () => {
     await user.type(screen.getByLabelText("Actual Pressure (in. wg):"), "3.0");
     await user.type(screen.getByLabelText("Actual Power:"), "250");
     await user.type(screen.getByLabelText("Gas Density (lb/ft^3):"), ".080713");
-    await user.click(screen.getByText("Submit"));
+    await user.click(screen.getByText("Calculate FEI"));
 
     expect(screen.getByText("0.04")).toBeInTheDocument();
     expect(screen.getByText("FEIs.i")).toBeInTheDocument();
@@ -55,7 +55,7 @@ describe("Form App", () => {
     );
     await user.type(screen.getByLabelText("Actual Power:"), "250");
     await user.type(screen.getByLabelText("Gas Density (lb/ft^3):"), ".080713");
-    await user.click(screen.getByText("Submit"));
+    await user.click(screen.getByText("Calculate FEI"));
 
     expect(screen.getByText("3.24")).toBeInTheDocument();
     expect(screen.getByText("FEIs.i")).toBeInTheDocument();
